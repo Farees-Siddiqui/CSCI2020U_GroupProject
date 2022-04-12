@@ -86,11 +86,12 @@ public class Server extends Application {
                     serve.setReuseAddress(true);
                     System.out.println("Starting server...");
                     System.out.println("wating for client connection...");
-                    Socket sock = serve.accept();
-                    System.out.println("Client is connected " + sock.getInetAddress().getHostAddress()); //this will display the host address of client
-                    ClientHandler client = new ClientHandler(sock);
-                    new Thread(client).start();
-
+                    while(true){
+                        Socket sock = serve.accept();
+                        System.out.println("Client is connected " + sock.getInetAddress().getHostAddress()); //this will display the host address of client
+                        ClientHandler client = new ClientHandler(sock);
+                        new Thread(client).start();
+                    } 
                 } catch (IOException e){
                     e.printStackTrace();
                 }

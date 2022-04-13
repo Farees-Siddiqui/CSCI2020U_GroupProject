@@ -77,7 +77,7 @@ public class Server extends Application {
         Group root = new Group(box, exit);
 
         Scene scene = new Scene(root, 575, 300);
-        stage.setTitle("SimpleBBS Server v1.0");
+        stage.setTitle("ChatBot Server v1.0");
         stage.setScene(scene);
         stage.show();
 

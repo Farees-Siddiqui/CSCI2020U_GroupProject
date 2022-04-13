@@ -1,4 +1,4 @@
-package com.example.groupproject;
+package com.example.lab10;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -33,28 +33,20 @@ public class Server extends Application {
             clientSock = socket;
         }
 
-<<<<<<< HEAD
         public void run() {
-
-=======
-        public void run(){
             board.setDisable(true); //disables user from editing chatroom board without using 'send'
->>>>>>> ae31254c6f71d636819bbac201cd356a12068cfd
             BufferedReader inStream = null;
             try {
                 inStream = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
+                FileWriter MesssageToFile = new FileWriter("message_log.txt", true);
+                BufferedWriter out = new BufferedWriter(MesssageToFile);
 
                 while ((message = inStream.readLine()) != null) {
-                    FileWriter MesssageToFile = new FileWriter("message.txt",true);
-                    BufferedWriter out = new BufferedWriter(MesssageToFile);
-	                out.write(message);
-	                out.close();
-                    //MesssageToFile.write(message);
-                    //MesssageToFile.append(message)
-                    //MesssageToFile.close();
-                    board.appendText(message + "\n");
-
+                    message += "\n";
+                    out.write(message);
+                    board.appendText(message);
                 }
+                out.close();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -100,12 +92,6 @@ public class Server extends Application {
                     while (true) {
                         Socket sock = serve.accept();
                         System.out.println("Client is connected " + sock.getInetAddress().getHostAddress()); // this
-                                                                                                             // will
-                                                                                                             // display
-                                                                                                             // the host
-                                                                                                             // address
-                                                                                                             // of
-                                                                                                             // client
                         ClientHandler client = new ClientHandler(sock);
                         new Thread(client).start();
                     }
@@ -119,7 +105,6 @@ public class Server extends Application {
                 }
             }
         }).start();
-
     }
 
     public static void main(String[] args) {

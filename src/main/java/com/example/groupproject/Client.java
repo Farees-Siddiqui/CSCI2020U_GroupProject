@@ -1,9 +1,10 @@
-package com.example.groupproject;
+package com.example.csci2020uproject;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,7 +15,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -27,24 +27,75 @@ public class Client extends Application {
     public static TextField messageTxt = new TextField();
     public static Button send = new Button("Send");
     public static Button exit = new Button("Exit");
+    public static Button login = new Button("Login");
     public static PrintWriter dout;
 
     @Override
     public void start(Stage stage) throws IOException {
-        send.setTranslateX(50);
-        send.setTranslateY(150);
+        login.setTranslateX(50);
+        login.setTranslateY(100);
 
         Label username = new Label("Username: ");
         Label messageLbl = new Label("Message: ");
 
-        messageLbl.setTranslateX(-220);
-        messageLbl.setTranslateY(50);
+        exit.setTranslateX(50);
+        exit.setTranslateY(135);
 
-        messageTxt.setTranslateX(-220);
-        messageTxt.setTranslateY(50);
+        new Thread(new Runnable() {
+            public void run() {
+                try (Socket sock = new Socket("localhost", 6666)){
+                    System.out.println("Connected to server...");
+                    //get input from the user to send as a message
+                    PrintWriter dout = new PrintWriter(sock.getOutputStream(), true);
+                    while(!exitStatus.get()){
+                        login.setOnAction(e -> {
+                            uName.set(uNameTxt.getText());
+
+                            login.getScene().setRoot(messageScreen(messageLbl, stage, uName));
+
+                        });
+
+                        exit.setOnAction(e -> {
+                            exitStatus.set(true);
+                            Platform.exit();
+                            System.exit(0);
+                        });
+                    }
+                }
+                catch(IOException e){
+                    e.printStackTrace();
+                }
+                System.out.println("Connection terminated...");
+            }
+        }).start();
+
+
+
+
+        HBox box = new HBox(5);
+        box.setPadding(new Insets(25, 5, 5, 50));
+        box.getChildren().addAll(username, uNameTxt);
+        Group root = new Group(box, login, exit);
+
+        Scene scene = new Scene(root, 320, 240);
+        stage.setTitle("Lab 10 Client");
+        stage.setScene(scene);
+        stage.show();
+
+    }
+
+    private Parent messageScreen(Label messageLbl, Stage stage, AtomicReference<String> uName) {
+        send.setTranslateX(50);
+        send.setTranslateY(100);
+
+        messageLbl.setTranslateX(0);
+        messageLbl.setTranslateY(40);
+
+        messageTxt.setTranslateX(0);
+        messageTxt.setTranslateY(40);
 
         exit.setTranslateX(50);
-        exit.setTranslateY(200);
+        exit.setTranslateY(135);
 
         new Thread(new Runnable() {
             public void run() {
@@ -54,7 +105,6 @@ public class Client extends Application {
                     PrintWriter dout = new PrintWriter(sock.getOutputStream(), true);
                     while(!exitStatus.get()){
                         send.setOnAction(e -> {
-                            uName.set(uNameTxt.getText());
                             message.set(messageTxt.getText());
 
                             // socket.send the stuff
@@ -80,14 +130,14 @@ public class Client extends Application {
 
         HBox box = new HBox(5);
         box.setPadding(new Insets(25, 5, 5, 50));
-        box.getChildren().addAll(username, uNameTxt, messageLbl, messageTxt);
+        box.getChildren().addAll(messageLbl, messageTxt);
         Group root = new Group(box, send, exit);
 
         Scene scene = new Scene(root, 320, 240);
-        stage.setTitle("SimpleBBS Client v1.0");
+        stage.setTitle("Lab 10 Client");
         stage.setScene(scene);
         stage.show();
-
+        return null;
     }
 
     public static void main(String[] args) {

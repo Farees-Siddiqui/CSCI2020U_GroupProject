@@ -1,4 +1,4 @@
-package com.example.csci2020uproject;
+package com.example.lab10;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -8,15 +8,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.example.lab10.Server.board;
 
 public class Client extends Application {
     public static AtomicReference<String> uName = new AtomicReference<>("");
@@ -51,8 +56,7 @@ public class Client extends Application {
                         login.setOnAction(e -> {
                             uName.set(uNameTxt.getText());
 
-                            login.getScene().setRoot(messageScreen(messageLbl, stage, uName));
-
+                            login.getScene().setRoot(messageScreen(messageLbl, stage, uName, board));
                         });
 
                         exit.setOnAction(e -> {
@@ -68,8 +72,6 @@ public class Client extends Application {
                 System.out.println("Connection terminated...");
             }
         }).start();
-
-
 
 
         HBox box = new HBox(5);
@@ -84,7 +86,9 @@ public class Client extends Application {
 
     }
 
-    private Parent messageScreen(Label messageLbl, Stage stage, AtomicReference<String> uName) {
+    private Parent messageScreen(Label messageLbl, Stage stage, AtomicReference<String> uName, TextArea board) {
+        stage.setWidth(900);
+        board.setDisable(true);
         send.setTranslateX(50);
         send.setTranslateY(100);
 
@@ -99,8 +103,11 @@ public class Client extends Application {
 
         new Thread(new Runnable() {
             public void run() {
+                BufferedReader inStream = null;
                 try (Socket sock = new Socket("localhost", 6666)){
                     System.out.println("Connected to server...");
+                    inStream = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+
                     //get input from the user to send as a message
                     PrintWriter dout = new PrintWriter(sock.getOutputStream(), true);
                     while(!exitStatus.get()){
@@ -109,6 +116,7 @@ public class Client extends Application {
 
                             // socket.send the stuff
                             dout.println(uName + ": " + message);
+                            board.appendText(uName + ": " + message + "\n");
 
                         });
 
@@ -130,7 +138,7 @@ public class Client extends Application {
 
         HBox box = new HBox(5);
         box.setPadding(new Insets(25, 5, 5, 50));
-        box.getChildren().addAll(messageLbl, messageTxt);
+        box.getChildren().addAll(messageLbl, messageTxt, board);
         Group root = new Group(box, send, exit);
 
         Scene scene = new Scene(root, 320, 240);

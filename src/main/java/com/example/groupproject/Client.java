@@ -142,7 +142,7 @@ public class Client extends Application {
         Group root = new Group(box, send, exit);
 
         Scene scene = new Scene(root, 320, 240);
-        stage.setTitle("Lab 10 Client");
+        stage.setTitle("ChatBot Client");
         stage.setScene(scene);
         stage.show();
         return null;

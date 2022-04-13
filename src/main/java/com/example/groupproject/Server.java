@@ -32,7 +32,7 @@ public class Server extends Application {
         }
 
         public void run(){
-
+            board.setDisable(true); //disables user from editing chatroom board without using 'send'
             BufferedReader inStream = null;
             try {
                 inStream = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));

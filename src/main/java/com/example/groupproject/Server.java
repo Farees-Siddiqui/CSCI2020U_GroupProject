@@ -10,6 +10,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.io.*;
+import java.io.FileWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,34 +25,38 @@ public class Server extends Application {
     public static HBox box = new HBox();
     public static Button exit = new Button("Exit");
 
-    private static class ClientHandler implements Runnable{
+    private static class ClientHandler implements Runnable {
 
         private final Socket clientSock;
 
-        public ClientHandler(Socket socket){
+        public ClientHandler(Socket socket) {
             clientSock = socket;
         }
 
-        public void run(){
+        public void run() {
 
             BufferedReader inStream = null;
             try {
                 inStream = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
 
-
-                while ((message = inStream.readLine()) != null){
+                while ((message = inStream.readLine()) != null) {
+                    FileWriter MesssageToFile = new FileWriter("message.txt",true);
+                    BufferedWriter out = new BufferedWriter(MesssageToFile);
+	                out.write(message);
+	                out.close();
+                    //MesssageToFile.write(message);
+                    //MesssageToFile.append(message)
+                    //MesssageToFile.close();
                     board.appendText(message + "\n");
+
                 }
-            }
-            catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 try {
                     inStream.close();
                     clientSock.close();
-                }
-                catch(IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -61,7 +67,7 @@ public class Server extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
-        box.setPadding(new Insets(25, 5 , 5, 50));
+        box.setPadding(new Insets(25, 5, 5, 50));
         box.getChildren().addAll(board);
         exit.setTranslateX(50);
         exit.setTranslateY(250);
@@ -86,23 +92,28 @@ public class Server extends Application {
                     serve.setReuseAddress(true);
                     System.out.println("Starting server...");
                     System.out.println("wating for client connection...");
-                    while(true){
+                    while (true) {
                         Socket sock = serve.accept();
-                        System.out.println("Client is connected " + sock.getInetAddress().getHostAddress()); //this will display the host address of client
+                        System.out.println("Client is connected " + sock.getInetAddress().getHostAddress()); // this
+                                                                                                             // will
+                                                                                                             // display
+                                                                                                             // the host
+                                                                                                             // address
+                                                                                                             // of
+                                                                                                             // client
                         ClientHandler client = new ClientHandler(sock);
                         new Thread(client).start();
-                    } 
-                } catch (IOException e){
+                    }
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 try {
                     serve.close();
-                } catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-
 
     }
 

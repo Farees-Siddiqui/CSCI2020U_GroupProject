@@ -1,4 +1,4 @@
-package com.example.lab10;
+package com.example.csci2020u_groupproject;
 
 import javafx.application.Application;
 import javafx.application.Platform;

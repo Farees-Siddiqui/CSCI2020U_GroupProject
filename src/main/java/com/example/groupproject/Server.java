@@ -28,11 +28,17 @@ public class Server extends Application {
     private static class ClientHandler implements Runnable {
 
         private final Socket clientSock;
-
+        
+        /**
+        *@param socket used for client connection
+        */
         public ClientHandler(Socket socket) {
             clientSock = socket;
         }
-
+        
+        /**
+        *Function that runs a thread to read in data from the client socket
+        */
         public void run() {
             board.setDisable(true); //disables user from editing chatroom board without using 'send'
             BufferedReader inStream = null;
@@ -60,7 +66,10 @@ public class Server extends Application {
         }
 
     }
-
+    
+    /**
+    * Displays the server side GUI, also handles client connection on the socket
+    */
     @Override
     public void start(Stage stage) throws Exception {
 
@@ -106,7 +115,10 @@ public class Server extends Application {
             }
         }).start();
     }
-
+    
+    /*
+    * Main function, runs server GUI
+    */
     public static void main(String[] args) {
         launch();
     }

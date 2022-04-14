@@ -35,6 +35,9 @@ public class Client extends Application {
     public static Button login = new Button("Login");
     public static PrintWriter dout;
 
+    /*
+    * Function used for drawing the client GUI and handle connection to server socket (port 6666)
+    */
     @Override
     public void start(Stage stage) throws IOException {
         login.setTranslateX(50);
@@ -45,7 +48,9 @@ public class Client extends Application {
 
         exit.setTranslateX(50);
         exit.setTranslateY(135);
-
+        
+        // Thread used for connection to client.
+        // Used a thread so we could draw the GUI and connect to client simaltaneously
         new Thread(new Runnable() {
             public void run() {
                 try (Socket sock = new Socket("localhost", 6666)){
@@ -55,10 +60,11 @@ public class Client extends Application {
                     while(!exitStatus.get()){
                         login.setOnAction(e -> {
                             uName.set(uNameTxt.getText());
-
+                            // Used to change scene
                             login.getScene().setRoot(messageScreen(messageLbl, stage, uName, board));
                         });
-
+                        
+                        //Exit button
                         exit.setOnAction(e -> {
                             exitStatus.set(true);
                             Platform.exit();
@@ -85,7 +91,14 @@ public class Client extends Application {
         stage.show();
 
     }
-
+    
+    /*
+    * @param messageLbl to be drawn on secondary scene
+    * @param stage to be used for secondary sceen
+    * @param uName used for displaying the user who sends a messsage
+    * @param board the text area used to draw the message boars
+    * @return null
+    */
     private Parent messageScreen(Label messageLbl, Stage stage, AtomicReference<String> uName, TextArea board) {
         stage.setWidth(900);
         board.setDisable(true);
